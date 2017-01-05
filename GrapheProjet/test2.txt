@@ -1,0 +1,14 @@
+10
+A B C D E F G H I J
+1 2 3 4 5 6 7 8 9 10
+10
+A DEJ.
+B G.
+C FJ.
+D .
+E .
+F .
+G .
+H EG.
+I CAHB.
+J .

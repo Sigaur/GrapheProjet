@@ -1,0 +1,16 @@
+12
+ABCDEFHIJKLM
+2 5 4 2 5 5 9 1 5 9 1 1
+12
+A C.
+B CD.
+C L.
+D CHK.
+E FI.
+F GHI.
+G HI.
+H .
+I .
+J .
+K .
+L H.

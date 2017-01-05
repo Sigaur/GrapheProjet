@@ -8,7 +8,7 @@ calendrierTot::calendrierTot()
         temp.push_back(false);
     }
 
-    m_temps = 0;
+    m_temps = 11;
     m_nSommets = m_graphe.getSommets();
     for (int i = 0; i < m_nSommets; i++)
     {
@@ -38,7 +38,7 @@ void calendrierTot::lireOrdo()
         }
         */
     }
-    for(int i = 0; i < m_graphe.m_nbsommets; i++)
+    for(int i = 1; i < m_nSommets; i++)
     {
         tachesRestantes.push_back(i);
     }
@@ -48,47 +48,19 @@ void calendrierTot::tabOrdonnancement()
 {
     m_graphe.lecture();
     m_graphe.grapheO();
-    //m_graphe.testAZ();
+    m_graphe.testAZ();
     m_graphe.graphe();
     //m_graphe.~Graphe();
 }
 
 void calendrierTot::update()
 {
-
-    std::cout<<"Boucle"<<std::endl<<std::endl;
-
-    std::cout<<std::endl<<std::endl<<"Taches restantes:"<< std::endl;
-    for (int i = 0; i < tachesRestantes.size(); i++)
-    {
-        std::cout<<tachesRestantes[i]<<"/";
-    }
-    std::cout<<std::endl<<std::endl;
-
-    std::cout<<std::endl<<std::endl<<"Taches Execution:"<< std::endl;
-    for (int i = 0; i < tachesExecutions.size(); i++)
-    {
-        std::cout<<tachesExecutions[i][0]<<"/"<<tachesExecutions[i][1]<<std::endl;
-    }
-    std::cout<<std::endl<<std::endl;
-
-    std::cout<<std::endl<<std::endl<<"Taches Finies:"<< std::endl;
-    for (int i = 0; i < tachesFinies.size(); i++)
-    {
-        std::cout<<tachesFinies[i]<<"/";
-    }
-    std::cout<<std::endl<<std::endl;
-
     testTachesRestantes();
-    //std::cout<<"Trace A"<<std::endl<<std::endl;
+    std::cout<<"Trace1";
     updateTachesExec();
-    //std::cout<<"Trace B"<<std::endl<<std::endl;
-    affichage();
-    //std::cout<<"Trace C"<<std::endl<<std::endl;
 
     m_temps ++;
-
-    if(isFinit() && m_temps > 1)
+    if(tachesRestantes.size() == 0 && tachesExecutions.size() == 0)
     {
         this->affichage();
     }
@@ -96,30 +68,6 @@ void calendrierTot::update()
     {
         this->update();
     }
-}
-
-bool calendrierTot::isFinit()
-{
-    if(m_temps > 100)
-    {
-        std::cout<<std::endl<<"Erreur Temps depasse";
-        return true;
-    }
-    for (int i = 0; i < tachesExecutions.size(); i++)
-    {
-        if (tachesExecutions[i][0] != -1)
-        {
-            return false;
-        }
-    }
-    for (int i = 0; i < tachesRestantes.size(); i++)
-    {
-        if (tachesRestantes[i] != -1)
-        {
-            return false;
-        }
-    }
-    return true;
 }
 
 void calendrierTot::testTachesRestantes()
@@ -130,36 +78,36 @@ void calendrierTot::testTachesRestantes()
 
     for (int i = 0; i < tachesRestantes.size(); i++)
     {
-        if(tachesRestantes[i] != -1)
+        if(tachesRestantes[i] != 0)
         {
             numTacheTemp = tachesRestantes[i];//recuperation d une tache restante
             executionPossible = true;
-
-            for (int j = 1; j < m_graphe.m_DefTabDuree[0].size(); j++)
-            {
-
-                contrainteTemp = m_graphe.m_DefTabDuree[j][numTacheTemp+1];
-                if(contrainteTemp != 0)
-                {
-                    if(! tacheEstFinit(j-1))
-                    {
-                        executionPossible = false;
-                    }
-                }
-            }
         }
         else
         {
             executionPossible = false;
         }
 
+        for (int j = 1; j < m_nSommets; j++)
+        {
+            contrainteTemp = m_graphe.m_DefTabDuree[numTacheTemp][j];
+            if(contrainteTemp != 0)
+            {
+                if(! tacheEstFinit(j))
+                {
+                    executionPossible = false;
+                }
+            }
+        }
 
         if (executionPossible)
         {
-            //std::cout<<"Debut tache:" << i<< std::endl;
             debutTache(i);
+            i = 0;//remise a zero
+            std::cout<<"TRACE";
         }
     }
+    std::cout<<"TRACE";
 }
 
 bool calendrierTot::tacheEstFinit(int tache)
@@ -172,13 +120,11 @@ bool calendrierTot::tacheEstFinit(int tache)
             estFinie = true;
         }
     }
-
     return estFinie;
 }
 
 void calendrierTot::debutTache(int tache)
 {
-
     int positionTache;
     std::vector <int> nouvelleColonne;
 
@@ -189,7 +135,7 @@ void calendrierTot::debutTache(int tache)
         if (tachesRestantes[i] == tache)
         {
             //positionTache = i;
-            tachesRestantes[i] = -1;
+            tachesRestantes[i] = 0;
         }
     }
     //tachesFinies.erase(tachesRestantes.begin() + positionTache);
@@ -200,32 +146,21 @@ void calendrierTot::debutTache(int tache)
     tachesExecutions.push_back(nouvelleColonne);
 
     //Ecriture dans le tableau affichage
-    //std::cout<<std::endl<<std::endl<<"Ecriture Tache :"<<tache<<" de " << m_temps << " a " << (m_temps + m_graphe.m_durees[tache]);
-    for (int i = m_temps; i < (m_temps + m_graphe.m_durees[tache]); i++)
+    for (int i = 0; i < m_graphe.m_durees[tache]; i++)
     {
-
         affichageTab[tache][i] = true;
     }
-    //std::cout<<"Trace 2";
+
 }
 
 void calendrierTot::updateTachesExec()
 {
     for (int i = 0; i < tachesExecutions.size(); i++)
     {
-        if(tachesExecutions[i][0] != -1)
+        tachesExecutions[i][1] --;
+        if (tachesExecutions[i][1] <= 0)
         {
-            tachesExecutions[i][1] --;
-        }
-    }
-    for (int i = 0; i < tachesExecutions.size(); i++)
-    {
-        if(tachesExecutions[i][0] != -1)
-        {
-            if (tachesExecutions[i][1] <= 0)
-            {
-                finTache(tachesExecutions[i][0]);
-            }
+            finTache(i);
         }
     }
 }
@@ -239,20 +174,16 @@ void calendrierTot::finTache(int tache)
         if (tachesExecutions[i][0] == tache)
         {
             positionTache = i;
-            tachesExecutions[i][0] = -1;
-            tachesExecutions[i][1] = -1;
         }
     }
-    //tachesExecutions.erase(tachesExecutions.begin() + positionTache);
+    tachesExecutions.erase(tachesExecutions.begin() + positionTache);
 
     //Ajout dans le vector taches finies
-    //std::cout<<"Fin tache:" << tache << std::endl;
     tachesFinies.push_back(tache);
 }
 
 void calendrierTot::affichage()
 {
-    std::cout << std::endl << std::endl << "CALENDIRER AU PLUS TOT" << std::endl << std::endl;
     char numTache;
     for (int i = 0; i <= (2 * m_temps); i++)
     {
@@ -281,7 +212,6 @@ void calendrierTot::affichage()
         }
         std::cout << std::endl;
     }
-    system("pause");
 }
 
 calendrierTot::~calendrierTot()

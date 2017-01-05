@@ -34,9 +34,11 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="include/Graphe.h" />
 		<Unit filename="include/calendrierTot.h" />
 		<Unit filename="include/ordonancement.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/Graphe.cpp" />
 		<Unit filename="src/calendrierTot.cpp" />
 		<Unit filename="src/ordonancement.cpp" />
 		<Extensions>
