@@ -4,7 +4,7 @@ using namespace std;
 
 Graphe::Graphe()
 {
-
+    m_boucle = false;
 }
 
 void Graphe::affiche()
@@ -74,7 +74,7 @@ void Graphe::lecture()
             for (int t = 0; t < m_nbTaches; t++)
             {
                 monFlux >> tacheCourante;
-                cout<< endl << tacheCourante<<": ";
+                cout<< endl << tacheCourante<<":";
                 m_contraintes[t][0] = tacheCourante;
                 monFlux >> contrainteCourante;
 
@@ -82,7 +82,7 @@ void Graphe::lecture()
                 while (contrainteCourante != '.')// Condition de fin d'une contrainte '.'
                 {
                     countTemp ++;
-                    cout<< contrainteCourante<<" - ";
+                    cout<< contrainteCourante<<"-";
                     m_contraintes[t][countTemp] = contrainteCourante;
                     monFlux >> contrainteCourante;
                 }
@@ -128,9 +128,11 @@ int Graphe::getSommets()
 
 void Graphe::grapheO()
 {
+    vector<int> tempVec(2,0);
     char tempChar;
     int i = 0;
     int l = 0;
+    int rangTerminal = 0;
     m_nbsommets=m_nbTaches;// initialisation nb de sommets
 
     cout<<"====================Creation du Graphe d ordonnancement===================="<<endl<<endl;
@@ -157,7 +159,7 @@ void Graphe::grapheO()
         while(m_contraintes[j][i]!= '\0')
         {
             //cout<<m_contraintes[j][0]<<"-- ["<<m_durees[j]<<"]-->"<<m_contraintes[j][i]<< endl;
-            cout<<m_contraintes[j][i]<<"-- ["<<m_durees[(int)(m_contraintes[j][i] - 65)]<<"]-->"<<m_contraintes[j][0]<< endl;
+            cout<<m_contraintes[j][i]<<"--["<<m_durees[(int)(m_contraintes[j][i] - 65)]<<"]-->"<<m_contraintes[j][0]<< endl;
             //cout<<"Duree de tache :" << (int)(m_contraintes[j][i] - 65)<< endl;
             //m_preconstruction[j].push_back(m_contraintes[j][0]);// Stocker ces valeurs dans un tableau
             //m_DureePreconstruction.push_back(m_durees[j]);
@@ -170,7 +172,51 @@ void Graphe::grapheO()
         }
         l++;
     }
-    m_cle=l;// Recupere le nombre de ligne dans le tableau preconstruction
+    m_cle=l;
+
+    cout<<endl<<endl<<"Calcul des rangs:"<<endl;
+    this->calculRangs();
+
+        this->affichageRangs();
+
+
+
+        //AJOUT DE OMEGA
+        bool estPresent;
+        cout<<endl<<endl<<"Ajout omega:"<<endl;
+        for (int tacheTest = 0; tacheTest<m_nbsommets; tacheTest++ )
+        {
+            estPresent = false;
+            for (int j = 0; j<m_preconstruction.size(); j++ )
+            {
+                if((char)(tacheTest + 65) == m_preconstruction[j][0])
+                {
+                    estPresent = true;
+                }
+            }
+            if(!estPresent)
+            {
+                //cout<<"Ajout :"<<tacheTest<<endl;
+                cout<<(char)(tacheTest + 65)<<"--["<<m_durees[tacheTest]<<"]-->z"<< endl;
+                tempVec[0] = tacheTest;
+                tempVec[1] = m_durees[tacheTest];
+                m_omega.push_back(tempVec);
+            }
+        }
+
+        //AJOUT DE L ALPHA
+        cout<<endl<<endl<<"Ajout alpha:"<<endl;
+        for (int j = 0; j<m_nbTaches; j++ )
+        {
+            if(m_contraintes[j][1] == '\0')
+            {
+                cout<<"a--[0]-->"<<m_contraintes[j][0]<< endl;
+                tempVec[0] = m_contraintes[j][0];
+                tempVec[1] = 0;
+                m_alpha.push_back(tempVec);
+            }
+        }
+    // Recupere le nombre de ligne dans le tableau preconstruction
 /*
     for(int i = 0; i < m_preconstruction.size(); i++)
     {
@@ -274,6 +320,11 @@ void Graphe::graphe()
     // Initialisation de toutes les cases du graphe à -1 (case vide)
     std::vector< std::vector<char> > m_Tab = std::vector< std::vector<char> > (m_nbContraintes + 1, std::vector<char> (m_nbContraintes + 1));
     std::vector< std::vector<int> > m_TabDuree = std::vector< std::vector<int> > (m_nbContraintes + 1, std::vector<int> (m_nbContraintes + 1));
+    std::vector<char> tempAlphaCharVec;
+    std::vector<char> tempOmegaCharVec;
+
+    std::vector<int> tempAlphaIntVec;
+    std::vector<int> tempOmegaIntVec;
     m_Tab[0][0]= '/';
 
     for (int v =0; v< m_Tab.size();v++)
@@ -348,21 +399,93 @@ void Graphe::graphe()
         cout << endl;
     }
 */
+///////////////////////SAUVEGARDE//////////////////
+    m_DefTab = m_Tab;
+    m_DefTabDuree = m_TabDuree;
+///////////////////////SAUVEGARDE//////////////////
+
+
+   //Ajout de alpha et omega
+    m_Tab[0].push_back('a');
+    m_Tab[0].push_back('z');
+
+    for(int i = 1; i < m_Tab.size(); i++)
+    {
+        m_Tab[i].push_back('0');
+        m_Tab[i].push_back('0');
+    }
+
+
+    tempAlphaCharVec.push_back('a');
+    for(int i = 0; i < m_nbsommets+2; i++)
+    {
+        tempAlphaCharVec.push_back('0');
+    }
+    m_Tab.push_back(tempAlphaCharVec);
+
+    tempOmegaCharVec.push_back('z');
+    for(int i = 0; i < m_nbsommets+2; i++)
+    {
+        tempOmegaCharVec.push_back('0');
+    }
+    m_Tab.push_back(tempOmegaCharVec);
+
+
+
+    for(int i = 0; i < m_TabDuree.size(); i++)
+    {
+        m_TabDuree[i].push_back(0);
+        m_TabDuree[i].push_back(0);
+    }
+
+    tempAlphaIntVec.push_back(0);
+    for(int i = 0; i < m_nbsommets+2; i++)
+    {
+        tempAlphaIntVec.push_back(0);
+    }
+    m_TabDuree.push_back(tempAlphaIntVec);
+
+    tempOmegaIntVec.push_back(0);
+    for(int i = 0; i < m_nbsommets+2; i++)
+    {
+        tempOmegaIntVec.push_back(0);
+    }
+    m_TabDuree.push_back(tempOmegaIntVec);
+
+    for(int i = 0; i < m_alpha.size(); i++)
+    {
+        //cout << m_TabDuree.size()-2 << "/"<<(m_alpha[i][0] + 1) - 65<<endl;
+        m_TabDuree[m_TabDuree.size()-2][m_alpha[i][0] + 1  - 65] = -1;
+    }
+
+    for(int i = 0; i < m_omega.size(); i++)
+    {
+        //cout << m_omega[i][0] + 1  - 65 << "/"<<m_TabDuree.size()-1<<endl;
+        m_TabDuree[m_omega[i][0] + 1][m_TabDuree.size()-1] = m_omega[i][1];
+    }
+
+
     cout <<endl<<endl<< "TABLEAU ORDONNANCEMENT:"<<endl<<endl;
     for(int i = 0; i < m_Tab.size(); i++)
     {
         for(int j = 0; j < m_Tab[i].size(); j ++)
         {
             if(i==0 || j==0)
-            cout << m_Tab[i][j]<<"  ";
+            cout << m_Tab[i][j]<<"|  |";
             else
-            cout << m_TabDuree[i][j]<<"  ";
+            {
+                if(m_TabDuree[i][j]==0)
+                    cout << " "<<"|  |";
+                else if(m_TabDuree[i][j]==-1)
+                    cout << "0"<<"|  |";
+                else
+                    cout << m_TabDuree[i][j]<<"|  |";
+            }
+
         }
         cout << endl;
     }
 
-    m_DefTab = m_Tab;
-    m_DefTabDuree = m_TabDuree;
     /*
     // ============== Affichage Graphe =====================
     cout<<"\n -----------------------------------\n"<<endl;
@@ -387,6 +510,72 @@ void Graphe::graphe()
          }
      }
      */
+}
+
+int Graphe::calculRangRec(int numSommet, int compteur)//Si un sommet n'a pas de contrainte alors il est de rang 1 A VERIFIER
+{
+    m_compteur++;
+    if(m_compteur > 500)
+        return 0;
+    //std::cout<<"Trace1"<<std::endl;
+    std::vector <int> tempRecursif;
+    bool tempTrouvitude = false;
+
+    for (int i = 0; i < m_preconstruction.size(); i ++)//Placeholder pour getSommet
+    {
+        if ((int)(m_preconstruction[i][1]) - 65 == (numSommet))
+        {
+            tempRecursif.push_back(calculRangRec((int)(m_preconstruction[i][0]) - 65, compteur+1));//Si une contrainte est trouvée, on l'insère dans le vecteur temporaire
+            tempTrouvitude = true;
+        }
+    }
+    if (tempTrouvitude)
+        return (1 + (maxVecteur(tempRecursif)));//Si il a trouve des contraintes, il calul le rang maximum des branches et l'incremente
+    else
+        return 1;//Le premier sommet est de rang 1
+}
+
+int Graphe::maxVecteur(std::vector <int> vec)
+{
+    int maximum = -1;
+    for (int i = 0; i < vec.size(); i ++)
+    {
+        if(maximum < vec[i])
+            maximum = vec[i];
+    }
+    return maximum;
+}
+
+
+bool Graphe::calculRangs()//return false si boucle
+{
+    int temp;
+    for(int i = 0; i < m_nbsommets; i++)
+    {
+        m_compteur = 0;
+
+        temp = calculRangRec(i, 0);
+        if(m_compteur > 500)
+        {
+            m_rangs.push_back(-1);
+            m_boucle = true;
+        }
+        //m_rangs[i] = calculRangRec(i);
+        else
+            m_rangs.push_back(temp);
+    }
+    return true;
+}
+
+void Graphe::affichageRangs()
+{
+    for(int i = 0; i < m_nbsommets; i++)
+    {
+        if(m_rangs[i]==-1)
+            std::cout << (char) (i + 65) <<" Sommet dans une Boucle"<< std::endl;
+        else
+            std::cout << (char) (i + 65) << " " << m_rangs[i] << std::endl;
+    }
 }
 
 Graphe::~Graphe()

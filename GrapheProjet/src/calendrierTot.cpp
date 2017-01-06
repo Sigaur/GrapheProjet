@@ -42,6 +42,8 @@ void calendrierTot::lireOrdo()
     {
         tachesRestantes.push_back(i);
     }
+
+    //m_rangs = std::vector <bool> (m_graphe.m_nbsommets);//-2 avec alpha et omega!!!
 }
 
 void calendrierTot::tabOrdonnancement()
@@ -55,7 +57,7 @@ void calendrierTot::tabOrdonnancement()
 
 void calendrierTot::update()
 {
-
+    /*
     std::cout<<"Boucle"<<std::endl<<std::endl;
 
     std::cout<<std::endl<<std::endl<<"Taches restantes:"<< std::endl;
@@ -78,12 +80,12 @@ void calendrierTot::update()
         std::cout<<tachesFinies[i]<<"/";
     }
     std::cout<<std::endl<<std::endl;
-
+    */
     testTachesRestantes();
     //std::cout<<"Trace A"<<std::endl<<std::endl;
     updateTachesExec();
     //std::cout<<"Trace B"<<std::endl<<std::endl;
-    affichage();
+    //affichage();
     //std::cout<<"Trace C"<<std::endl<<std::endl;
 
     m_temps ++;
@@ -252,7 +254,7 @@ void calendrierTot::finTache(int tache)
 
 void calendrierTot::affichage()
 {
-    std::cout << std::endl << std::endl << "CALENDIRER AU PLUS TOT" << std::endl << std::endl;
+    std::cout << std::endl << std::endl << "CALENDRIER AU PLUS TOT" << std::endl << std::endl;
     char numTache;
     for (int i = 0; i <= (2 * m_temps); i++)
     {

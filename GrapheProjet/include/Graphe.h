@@ -11,6 +11,12 @@ class Graphe
 {
 public:
 
+    std::vector< std::vector<int> > m_alpha;
+    std::vector< std::vector<int> > m_omega;
+
+    std::vector <int> m_rangs;
+    int m_compteur;
+    bool m_boucle;
     int m_nbTaches;
     int m_nbsommets;
     int m_nbContraintes;
@@ -33,6 +39,12 @@ public:
     std::vector<int> getDuree();
     int getTaches();
     int getSommets();
+
+    int calculRangRec(int sommet, int compteur);
+    int maxVecteur(std::vector <int> vec);
+    bool calculRangs();
+    void affichageRangs();
+
     ~Graphe();
 };
 
