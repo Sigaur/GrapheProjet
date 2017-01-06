@@ -27,6 +27,9 @@ public:
     std::vector< std::vector<char> >m_preconstruction;// Contient les contraintes, liaisons et sommets pour construire le tab
     std::vector< std::vector<char> >m_DefTab;// Le tableau
     std::vector< std::vector<int> >m_DefTabDuree;
+
+    std::vector< std::vector<char> >m_DefTabTard;// Le tableau
+    std::vector< std::vector<int> >m_DefTabDureeTard;
     std::vector<int> m_DureePreconstruction;
 
     Graphe();

@@ -3,7 +3,7 @@
 calendrierTot::calendrierTot()
 {
     std::vector <bool> temp;
-    for(int i = 0; i < 1129; i++)
+    for(int i = 0; i < 50; i++)
     {
         temp.push_back(false);
     }
@@ -19,6 +19,18 @@ calendrierTot::calendrierTot()
         }
         */
     }
+
+    for (int i = 0; i < m_nSommets+2; i++)
+    {
+        affichageTabTard.push_back(temp);
+        /*for (int j = 0; j < m_temps; j++)
+        {
+            affichageTab[i][j] = false;
+        }
+        */
+    }
+
+    m_arretitude = false;
 }
 
 void calendrierTot::lireOrdo()
@@ -42,7 +54,6 @@ void calendrierTot::lireOrdo()
     {
         tachesRestantes.push_back(i);
     }
-
     //m_rangs = std::vector <bool> (m_graphe.m_nbsommets);//-2 avec alpha et omega!!!
 }
 
@@ -102,9 +113,10 @@ void calendrierTot::update()
 
 bool calendrierTot::isFinit()
 {
-    if(m_temps > 100)
+    if(m_temps > 29)
     {
-        std::cout<<std::endl<<"Erreur Temps depasse";
+        std::cout<<std::endl<<"Graphe presentant une boucle!!";
+        m_arretitude = true;
         return true;
     }
     for (int i = 0; i < tachesExecutions.size(); i++)
@@ -284,9 +296,265 @@ void calendrierTot::affichage()
         std::cout << std::endl;
     }
     system("pause");
+    if(m_arretitude)
+    {
+        exit(0);
+    }
 }
+
+
+
+
+
+/////////////////////////////TARD//////////////////
+void calendrierTot::lancementTard()
+{
+    if(!m_graphe.m_boucle)
+        initialisationTard();
+}
+
+void calendrierTot::initialisationTard()
+{
+    std::cout<<"Initialisation"<<std::endl;
+    int tempTache;
+    int j = m_graphe.m_DefTabTard.size()-1;
+
+        tempTache = (int)(m_graphe.m_DefTabTard[0][j] - 65);
+        for (int i = 1; i < m_graphe.m_DefTabTard[0].size(); i++)
+        {
+            if(m_graphe.m_DefTabDureeTard[i][j] != 0)
+            {
+                debutTacheTard(i-1);
+            }
+        }
+    m_tempsTard = m_temps;
+    updateTard();
+}
+
+void calendrierTot::updateTard()
+{/*
+    std::cout<<"Boucle"<<std::endl<<std::endl;
+
+    std::cout<<std::endl<<std::endl<<"Taches Execution:"<< std::endl;
+    for (int i = 0; i < tachesExecutionsTard.size(); i++)
+    {
+        std::cout<<tachesExecutionsTard[i][0]<<"/"<<tachesExecutionsTard[i][1]<<std::endl;
+    }
+    std::cout<<std::endl<<std::endl;
+
+    std::cout<<std::endl<<std::endl<<"Taches Finies:"<< std::endl;
+    for (int i = 0; i < tachesFiniesTard.size(); i++)
+    {
+        std::cout<<tachesFiniesTard[i]<<"/";
+    }
+    std::cout<<std::endl<<std::endl;
+
+*/
+    //std::cout<<"Update"<<std::endl;
+    testTachesRestantesTard();
+    //std::cout<<"Trace A"<<std::endl<<std::endl;
+    //std::cout<<"Update1"<<std::endl;
+    updateTachesExecTard();
+    //std::cout<<"Trace B"<<std::endl<<std::endl;
+    //affichage();
+    //std::cout<<"Trace C"<<std::endl<<std::endl;
+    //std::cout<<"Update2"<<std::endl;
+    m_temps --;
+    //affichageTard();
+
+    //system("pause");
+
+    if(isFinitTard())
+    {
+        this->affichageTard();
+    }
+    else
+    {
+        this->updateTard();
+    }
+}
+
+bool calendrierTot::isFinitTard()
+{
+    if(m_temps <= 0)
+    {
+        //std::cout<<std::endl<<"Erreur Temps depasse";
+        return true;
+    }
+    if(tachesFiniesTard.size()>= m_graphe.m_nbsommets)
+        return true;
+
+    return false;
+}
+
+void calendrierTot::testTachesRestantesTard()
+{
+    int tempTache;
+    bool finitude;
+    for (int j = 0; j < tachesFiniesTard.size(); j++)
+    {
+        //std::cout<<"TEST :"<<tachesFiniesTard[j]+1<<std::endl;
+        tempTache = (int)(m_graphe.m_DefTabTard[0][tachesFiniesTard[j]+1] - 65);
+        for (int i = 1; i < m_graphe.m_DefTabTard[0].size()-2; i++)
+        {
+            finitude = true;
+            for(int k = 1; k < m_graphe.m_DefTabDureeTard[i].size(); k++)
+            {
+                if(m_graphe.m_DefTabDureeTard[i][k]!= 0)
+                {
+                    if(! tacheEstFinitTard(k-1))
+                        finitude = false;
+                }
+            }
+            if(finitude)
+            {
+                if(m_graphe.m_DefTabDureeTard[i][tachesFiniesTard[j]+1]!=0)
+                {
+                    if(!tacheEstFinitTard(i-1))
+                    {
+                        if(!tacheEstexecution(i-1))
+                        {
+                            //std::cout<<"Gagne!!!!!!!!!:"<<i<<std::endl;
+                            debutTacheTard(i-1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+bool calendrierTot::tacheEstexecution(int tache)
+{
+    bool estFinie = false;
+    for (int i = 0; i < tachesExecutionsTard.size(); i++)
+    {
+        if (tachesExecutionsTard[i][0] == tache)
+        {
+            estFinie = true;
+        }
+    }
+
+    return estFinie;
+}
+
+bool calendrierTot::tacheEstFinitTard(int tache)
+{
+    bool estFinie = false;
+    for (int i = 0; i < tachesFiniesTard.size(); i++)
+    {
+        if (tachesFiniesTard[i] == tache)
+        {
+            estFinie = true;
+        }
+    }
+
+    return estFinie;
+}
+
+void calendrierTot::debutTacheTard(int tache)
+{
+    std::vector<int> temp(2,0);
+
+    //Suppression du tableau tachesRestantes
+
+    //tachesFinies.erase(tachesRestantes.begin() + positionTache);
+
+    //Ajout dans le Tableau Taches Executions
+    temp[0] = tache;
+    temp[1] = m_graphe.m_durees[tache];
+    tachesExecutionsTard.push_back(temp);
+
+    //Ecriture dans le tableau affichage
+
+    //std::cout<<std::endl<<std::endl<<"Ecriture Tache :"<<tache<<" de " << m_temps << " a " << (m_temps - m_graphe.m_durees[tache]-1);
+    for (int i = m_temps-1; i > (m_temps - m_graphe.m_durees[tache]-1); i--)
+    {
+        affichageTabTard[tache][i] = true;
+    }
+    //std::cout<<"Trace 2";
+}
+
+void calendrierTot::updateTachesExecTard()
+{
+    for (int i = 0; i < tachesExecutionsTard.size(); i++)
+    {
+        if(tachesExecutionsTard[i][0] != -1)
+        {
+            tachesExecutionsTard[i][1] --;
+        }
+    }
+    for (int i = 0; i < tachesExecutionsTard.size(); i++)
+    {
+        if(tachesExecutionsTard[i][0] != -1)
+        {
+            if (tachesExecutionsTard[i][1] <= 0)
+            {
+                finTacheTard(tachesExecutionsTard[i][0]);
+            }
+        }
+    }
+}
+
+void calendrierTot::finTacheTard(int tache)
+{
+    int positionTache;
+    //Suppression du tableau tachesExecutions
+    for (int i = 0; i < tachesExecutionsTard.size(); i++)
+    {
+        if (tachesExecutionsTard[i][0] == tache)
+        {
+            positionTache = i;
+            tachesExecutionsTard[i][0] = -1;
+            tachesExecutionsTard[i][1] = -1;
+        }
+    }
+    //tachesExecutions.erase(tachesExecutions.begin() + positionTache);
+
+    //Ajout dans le vector taches finies
+    //std::cout<<"Fin tache:" << tache << std::endl;
+    tachesFiniesTard.push_back(tache);
+}
+
+void calendrierTot::affichageTard()
+{
+    std::cout << std::endl << std::endl << "CALENDRIER AU PLUS TARD" << std::endl << std::endl;
+    char numTache;
+    for (int i = 0; i <= (2 * m_tempsTard); i++)
+    {
+        if(i == 0)
+            std::cout << " ";
+        else if (i%2 == 0)
+            std::cout << " ";
+        else
+            std::cout << (i - 1)/2;
+    }
+    std::cout << std::endl;
+
+    for (int i = 0; i < m_nSommets; i++)
+    {
+        numTache = 65 + i;
+        std::cout << numTache;
+
+        for (int j = 0; j < (2 * m_tempsTard); j++)
+        {
+            if(j%2 == 0)
+                std::cout << "|";
+            else if(affichageTabTard[i][j/2])
+                std::cout << "=";
+            else
+                std::cout << " ";
+        }
+        std::cout << std::endl;
+    }
+    system("pause");
+}
+
+
+
 
 calendrierTot::~calendrierTot()
 {
+    m_graphe.~Graphe();
     //dtor
 }

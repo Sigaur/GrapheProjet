@@ -485,7 +485,8 @@ void Graphe::graphe()
         }
         cout << endl;
     }
-
+    m_DefTabTard = m_Tab;
+    m_DefTabDureeTard = m_TabDuree;
     /*
     // ============== Affichage Graphe =====================
     cout<<"\n -----------------------------------\n"<<endl;

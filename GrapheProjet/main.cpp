@@ -53,11 +53,12 @@ int main(int argc, const char * argv[])
 
                 calendrier.lireOrdo();
                 calendrier.update();
+                calendrier.lancementTard();
                 calendrier.~calendrierTot();
                 exit(0);
             break;
             case 2:
-                cout<<"\n Programme developpé par Gayraud, Laversanne et Zuber\n"<<endl;
+                cout<<"\n Programme developpe par Gayraud, Laversanne et Zuber\n"<<endl;
                 fin =true;
                 break;
 
